@@ -57,7 +57,7 @@ fs.createReadStream("petrubot.log")
 
 try {
 
-  ap.on("issues.opened", async (context) => {
+  app.on("issues.opened", async (context) => {
     const issueComment = context.issue({
       body: "Thanks for opening this issue!",
     });
