@@ -1,10 +1,61 @@
+const fs = require('fs');
+const readline = require('readline');
 /**
  * This is the main entrypoint to your Probot app
  * @param {import('probot').Probot} app
  */
+
+
+function makeLog(message) {
+
+  var today = new Date();
+
+var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+
+var i;
+var count = 0;
+fs.createReadStream("petrubot.log")
+  .on('data', function(chunk) {
+    for (i=0; i < chunk.length; ++i)
+      if (chunk[i] == 10) count++;
+  })
+  .on('end', function() {
+    console.log(count);
+    if(count == 20){
+      fs.unlinkSync("petrubot.log");
+    }else{
+      fs.appendFile('petrubot.log', content, err => {
+        if (err) {
+          console.error(err);
+        }
+        // file written successfully
+      });
+    }
+  });
+
+
+
+  var content = date + " | " + time + ": " + message + "\n";
+
+ /* fs.appendFile('petrubot.log', content, err => {
+    if (err) {
+      console.error(err);
+    }
+    // file written successfully
+  });*/
+}
+
+
  module.exports = (app) => {
   // Your code here
   app.log.info("Yay, the app was loaded!");
+
+  makeLog("Bot started");
+
+try {
 
   app.on("issues.opened", async (context) => {
     const issueComment = context.issue({
@@ -209,6 +260,10 @@
     return context.octokit.issues.createComment(issueComment);
   });
 
+}
+catch(err){
+  makeLog("Error: " + err.message);
+}
 
 
 
